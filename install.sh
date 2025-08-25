@@ -903,10 +903,7 @@ configure_docker() {
     
     # Build daemon.json content based on configuration
     local daemon_content="{
-  \"storage-driver\": \"${DOCKER_STORAGE_DRIVER}\",
-  \"storage-opts\": [
-    \"overlay2.override_kernel_check=true\"
-  ],"
+  \"storage-driver\": \"${DOCKER_STORAGE_DRIVER}\","
     
     # Add custom data-root if specified
     if [[ -n "$DOCKER_CUSTOM_DATA_ROOT" ]]; then
