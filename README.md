@@ -11,7 +11,7 @@ Before using this offline installer, you need to download the following files:
 ### Docker Engine Binary
 Download from: https://download.docker.com/linux/static/stable/
 - Choose your architecture (typically `x86_64`)
-- Download the latest stable version (e.g., `docker-28.2.2.tgz`)
+- Download the latest stable version (e.g., `docker-28.3.3.tgz`)
 - Rename it to `docker.tgz`
 - Place the downloaded file in the same directory as the installation scripts
 
@@ -26,8 +26,8 @@ Download from: https://github.com/docker/compose/releases
 
 | File | Version | Description |
 |------|---------|-------------|
-| docker-28.2.2.tgz | 28.2.2 | Docker Engine binary package |
-| docker-compose | Latest | Docker Compose binary |
+| docker.tgz | 28.3.3 | Docker Engine binary package |
+| docker-compose | 2.39.2 | Docker Compose binary |
 | docker.service | - | Docker systemd service file |
 | containerd.service | - | Containerd systemd service file |
 | docker.socket | - | Docker socket file |

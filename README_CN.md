@@ -11,7 +11,7 @@
 ### Docker 引擎二进制文件
 下载地址：https://download.docker.com/linux/static/stable/
 - 选择您的架构（通常是 `x86_64`）
-- 下载最新稳定版本（例如：`docker-28.2.2.tgz`）
+- 下载最新稳定版本（例如：`docker-28.3.3.tgz`）
 - 重命名为 `docker.tgz`
 - 将下载的文件放在与安装脚本相同的目录中
 
@@ -26,8 +26,8 @@
 
 | 文件 | 版本 | 说明 |
 |------|---------|-------------|
-| docker-28.2.2.tgz | 28.2.2 | Docker 引擎二进制包 |
-| docker-compose | Latest | Docker Compose 二进制文件 |
+| docker.tgz | 28.3.3 | Docker 引擎二进制包 |
+| docker-compose | 2.39.2 | Docker Compose 二进制文件 |
 | docker.service | - | Docker systemd 服务文件 |
 | containerd.service | - | Containerd systemd 服务文件 |
 | docker.socket | - | Docker socket 文件 |
