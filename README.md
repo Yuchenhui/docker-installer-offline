@@ -862,4 +862,4 @@ This installation script is under MIT License. Docker and Docker Compose follow 
 
 ---
 
-**Version**: 2.0.0 | **Updated**: 2024
+**Version**: 2.0.0 | **Updated**: 2025-08-25
