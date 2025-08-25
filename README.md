@@ -1,34 +1,54 @@
-# Docker 离线安装完整指南
+# Docker Offline Installation Complete Guide
 
-适用于无互联网连接环境的 Docker 和 Docker Compose 完整离线安装解决方案。
+[中文版本](README_CN.md)
 
-## 📦 安装包内容
+A complete offline installation solution for Docker and Docker Compose in environments without internet connectivity.
 
-| 文件 | 版本 | 说明 |
-|------|------|------|
-| docker-28.2.2.tgz | 28.2.2 | Docker Engine 二进制文件包 |
-| docker-compose | 最新版 | Docker Compose 二进制文件 |
-| docker.service | - | Docker systemd 服务文件 |
-| containerd.service | - | Containerd systemd 服务文件 |
-| docker.socket | - | Docker socket 文件 |
-| install.sh | 2.0 | 智能安装脚本（推荐） |
-| migrate_docker.sh | 1.0 | Docker数据迁移工具 |
-| uninstall.sh | 1.0 | 卸载脚本 |
+## 📥 Downloading Required Files
+
+Before using this offline installer, you need to download the following files:
+
+### Docker Engine Binary
+Download from: https://download.docker.com/linux/static/stable/
+- Choose your architecture (typically `x86_64`)
+- Download the latest stable version (e.g., `docker-28.2.2.tgz`)
+- Rename it to `docker.tgz`
+- Place the downloaded file in the same directory as the installation scripts
+
+### Docker Compose Binary
+Download from: https://github.com/docker/compose/releases
+- Choose the latest release
+- Download the Linux binary for your architecture (e.g., `docker-compose-linux-x86_64`)
+- Rename it to `docker-compose`
+- Place it in the same directory as the installation scripts
+
+## 📦 Package Contents
+
+| File | Version | Description |
+|------|---------|-------------|
+| docker-28.2.2.tgz | 28.2.2 | Docker Engine binary package |
+| docker-compose | Latest | Docker Compose binary |
+| docker.service | - | Docker systemd service file |
+| containerd.service | - | Containerd systemd service file |
+| docker.socket | - | Docker socket file |
+| install.sh | 2.0 | Smart installation script (recommended) |
+| migrate_docker.sh | 1.0 | Docker data migration tool |
+| uninstall.sh | 1.0 | Uninstallation script |
 
 ---
 
-# 方式一：自动脚本安装（推荐）
+# Method 1: Automated Script Installation (Recommended)
 
-## 📋 前置准备
+## 📋 Prerequisites
 
-### 系统要求
-- **架构**: Linux x86_64
-- **内核**: ≥ 3.10
-- **权限**: root 或 sudo
-- **空间**: 建议 10GB+
-- **Init**: systemd（推荐）
+### System Requirements
+- **Architecture**: Linux x86_64
+- **Kernel**: ≥ 3.10
+- **Privileges**: root or sudo
+- **Storage**: 10GB+ recommended
+- **Init**: systemd (recommended)
 
-### 支持的发行版
+### Supported Distributions
 - Ubuntu 18.04+
 - Debian 9+
 - CentOS 7+
@@ -36,102 +56,102 @@
 - Fedora 30+
 - openSUSE Leap 15+
 
-### 文件清单
-确保以下文件都在同一目录下：
-- `install.sh` - 主安装脚本
-- `docker-28.2.2.tgz` - Docker二进制文件包
-- `docker-compose` - Docker Compose二进制文件
-- `docker.service` - Docker systemd服务文件
-- `containerd.service` - Containerd systemd服务文件
-- `docker.socket` - Docker socket文件
+### File Checklist
+Ensure all files are in the same directory:
+- `install.sh` - Main installation script
+- `docker-28.2.2.tgz` - Docker binary package
+- `docker-compose` - Docker Compose binary
+- `docker.service` - Docker systemd service file
+- `containerd.service` - Containerd systemd service file
+- `docker.socket` - Docker socket file
 
-## 🚀 快速安装
+## 🚀 Quick Installation
 
-### 1. 基础安装（交互式）
+### 1. Basic Installation (Interactive)
 
 ```bash
-# 添加执行权限
+# Add execute permission
 chmod +x install.sh
 
-# 运行安装脚本
+# Run installation script
 sudo ./install.sh
 ```
 
-脚本将会：
-- 检测操作系统和环境
-- 分析磁盘空间并推荐存储位置
-- 询问是否自定义Docker数据目录
-- 执行安装并启动服务
+The script will:
+- Detect operating system and environment
+- Analyze disk space and recommend storage locations
+- Ask if you want to customize Docker data directory
+- Perform installation and start services
 
-### 2. 自动安装（无交互）
+### 2. Automatic Installation (Non-interactive)
 
 ```bash
-# 使用默认配置自动安装
+# Automatic installation with default configuration
 sudo ./install.sh --force-yes
 
-# 指定自定义数据目录自动安装
+# Automatic installation with custom data directory
 sudo ./install.sh --force-yes --data-root /data/docker
 ```
 
-### 3. 命令行参数
+### 3. Command Line Parameters
 
 ```bash
---force-yes, -y    # 自动确认所有提示
---data-root PATH   # 指定Docker数据目录
---debug           # 启用调试输出
---skip-checks     # 跳过系统检查（不推荐）
---help, -h        # 显示帮助信息
+--force-yes, -y    # Automatically confirm all prompts
+--data-root PATH   # Specify Docker data directory
+--debug           # Enable debug output
+--skip-checks     # Skip system checks (not recommended)
+--help, -h        # Show help information
 
-# 示例：组合使用多个选项
+# Example: Combining multiple options
 sudo ./install.sh --force-yes --data-root /mnt/docker --debug
 ```
 
-## 💾 存储配置
+## 💾 Storage Configuration
 
-### 交互式存储选择
+### Interactive Storage Selection
 
-运行脚本时，会显示磁盘分析：
+When running the script, disk analysis will be displayed:
 
 ```
 ==========================================
      Disk Space Analysis
 ==========================================
 
-文件系统     容量  已用  可用  使用% 挂载点
-/dev/sda2    100G  20G   80G   20%  /
-/dev/sdb1    500G  10G  490G    2%  /data
+Filesystem     Size  Used  Avail Use% Mounted on
+/dev/sda2      100G  20G   80G   20%  /
+/dev/sdb1      500G  10G  490G    2%  /data
 
-推荐的Docker数据存储位置:
+Recommended locations for Docker data:
 ----------------------------------------
-  ✓ /data/docker (推荐, 490GB 可用)
-  • /var/lib/docker (默认, 80GB 可用)
+  ✓ /data/docker (recommended, 490GB available)
+  • /var/lib/docker (default, 80GB available)
 ```
 
-### 命令行指定存储
+### Command Line Storage Specification
 
 ```bash
-# 直接指定数据目录
+# Directly specify data directory
 sudo ./install.sh --data-root /data/docker
 
-# 使用环境变量
+# Using environment variable
 sudo DOCKER_CUSTOM_DATA_ROOT=/mnt/docker ./install.sh
 ```
 
-### 迁移现有数据
+### Migrating Existing Data
 
-如果检测到现有Docker数据，脚本会自动覆盖安装。用户只需：
-1. 确认安装路径
-2. 确认是否安装Docker Compose
+If existing Docker data is detected, the script will automatically perform an overwrite installation. Users only need to:
+1. Confirm installation path
+2. Confirm whether to install Docker Compose
 
-## 🔧 环境变量配置
+## 🔧 Environment Variable Configuration
 
-可通过环境变量自定义安装路径：
+You can customize installation paths via environment variables:
 
 ```bash
-# 自定义二进制文件路径
+# Custom binary path
 sudo DOCKER_BIN_DIR=/opt/docker/bin ./install.sh
 
-# 完整自定义示例
+# Complete customization example
 sudo DOCKER_BIN_DIR=/opt/docker/bin \
      DOCKER_LINK_DIR=/usr/local/bin \
      DOCKER_DATA_DIR=/data/docker \
@@ -139,150 +159,148 @@ sudo DOCKER_BIN_DIR=/opt/docker/bin \
      ./install.sh
 ```
 
-### 支持的环境变量
+### Supported Environment Variables
 
-| 变量名 | 默认值 | 说明 |
-|--------|--------|------|
-| DOCKER_BIN_DIR | /usr/local/bin | Docker二进制文件目录 |
-| DOCKER_LINK_DIR | /usr/bin | 符号链接目录 |
-| DOCKER_DATA_DIR | /var/lib/docker | Docker数据目录 |
-| DOCKER_CONFIG_DIR | /etc/docker | Docker配置目录 |
-| DOCKER_STORAGE_DRIVER | overlay2 | 存储驱动 |
+| Variable | Default | Description |
+|----------|---------|-------------|
+| DOCKER_BIN_DIR | /usr/local/bin | Docker binary directory |
+| DOCKER_LINK_DIR | /usr/bin | Symbolic link directory |
+| DOCKER_DATA_DIR | /var/lib/docker | Docker data directory |
+| DOCKER_CONFIG_DIR | /etc/docker | Docker configuration directory |
+| DOCKER_STORAGE_DRIVER | overlay2 | Storage driver |
 
-## 📝 安装流程详解
+## 📝 Installation Process Details
 
-### 第一阶段：环境检测
-1. 检测操作系统类型和版本
-2. 验证系统架构（x86_64）
-3. 检查init系统（systemd/sysvinit/upstart）
+### Phase 1: Environment Detection
+1. Detect operating system type and version
+2. Verify system architecture (x86_64)
+3. Check init system (systemd/sysvinit/upstart)
 
-### 第二阶段：先决条件检查
-1. **内核版本** - 确保 ≥ 3.10
-2. **内核模块** - overlay、br_netfilter等
-3. **Cgroup支持** - v1或v2
-4. **存储驱动** - overlay2、devicemapper或vfs
-5. **磁盘空间** - 至少2GB可用
+### Phase 2: Prerequisite Checks
+1. **Kernel Version** - Ensure ≥ 3.10
+2. **Kernel Modules** - overlay, br_netfilter, etc.
+3. **Cgroup Support** - v1 or v2
+4. **Storage Driver** - overlay2, devicemapper, or vfs
+5. **Network Tools** - iptables (optional but recommended)
+6. **Disk Space** - At least 2GB available
 
-### 第三阶段：存储配置
-1. 分析磁盘使用情况
-2. 推荐合适的存储位置
-3. 选择或创建数据目录
-4. 处理现有数据迁移
+### Phase 3: Storage Configuration
+1. Analyze disk usage
+2. Recommend suitable storage locations
+3. Select or create data directory
+4. Handle existing data migration
 
-### 第四阶段：安装Docker
-1. 解压Docker二进制文件
-2. 复制到目标目录
-3. 创建符号链接
-4. 配置systemd服务
+### Phase 4: Docker Installation
+1. Extract Docker binaries
+2. Copy to target directory
+3. Create symbolic links
+4. Configure systemd services
 
-### 第五阶段：配置和启动
-1. 创建docker组
-2. 生成daemon.json配置
-3. 启动containerd服务
-4. 启动Docker服务
+### Phase 5: Configuration and Startup
+1. Create docker group
+2. Generate daemon.json configuration
+3. Start containerd service
+4. Start Docker service
 
-### 第六阶段：验证
-1. 检查Docker版本
-2. 验证服务状态
-3. 测试Docker功能
+### Phase 6: Verification
+1. Check Docker version
+2. Verify service status
+3. Test Docker functionality
 
 ---
 
-# 方式二：手动安装（备选方案）
+# Method 2: Manual Installation (Alternative)
 
-如果自动脚本安装失败，可以按照以下步骤手动安装。
+If the automated script fails, you can follow these manual installation steps.
 
-## 📋 前置条件
+## 📋 Prerequisites
 
-- Linux x86_64 系统
-- root 或 sudo 权限
-- 内核版本 ≥ 3.10
-- systemd 或其他 init 系统
+- Linux x86_64 system
+- root or sudo privileges
+- Kernel version ≥ 3.10
+- systemd or other init system
 
-## 🔧 安装步骤
+## 🔧 Installation Steps
 
-### 步骤 1: 解压 Docker 二进制文件
+### Step 1: Extract Docker Binaries
 
 ```bash
-# 解压 Docker 压缩包
+# Extract Docker archive
 tar -xvf docker-28.2.2.tgz
 
-# 查看解压内容
+# Check extracted content
 ls -la docker/
 ```
 
-### 步骤 2: 安装二进制文件
+### Step 2: Install Binaries
 
 ```bash
-# 创建目标目录（如果不存在）
+# Create target directory (if not exists)
 sudo mkdir -p /usr/local/bin
 
-# 移动所有二进制文件到目标目录
+# Move all binaries to target directory
 sudo mv docker/* /usr/local/bin/
 
-# 设置执行权限
+# Set execute permissions
 sudo chmod +x /usr/local/bin/docker*
 sudo chmod +x /usr/local/bin/containerd*
 sudo chmod +x /usr/local/bin/ctr
 sudo chmod +x /usr/local/bin/runc
 ```
 
-### 步骤 3: 创建符号链接
+### Step 3: Create Symbolic Links
 
-为了系统全局可访问，创建符号链接到 `/usr/bin`：
+For system-wide accessibility, create symbolic links to `/usr/bin`:
 
 ```bash
-# Docker 相关命令
+# Docker related commands
 sudo ln -s /usr/local/bin/docker /usr/bin/docker
 sudo ln -s /usr/local/bin/dockerd /usr/bin/dockerd
 sudo ln -s /usr/local/bin/docker-proxy /usr/bin/docker-proxy
 sudo ln -s /usr/local/bin/docker-init /usr/bin/docker-init
 
-# Containerd 相关命令
+# Containerd related commands
 sudo ln -s /usr/local/bin/containerd /usr/bin/containerd
 sudo ln -s /usr/local/bin/containerd-shim-runc-v2 /usr/bin/containerd-shim-runc-v2
 sudo ln -s /usr/local/bin/ctr /usr/bin/ctr
 sudo ln -s /usr/local/bin/runc /usr/bin/runc
 ```
 
-### 步骤 4: 创建 Docker 组
+### Step 4: Create Docker Group
 
 ```bash
-# 创建 docker 组（如果不存在）
+# Create docker group (if not exists)
 sudo groupadd docker 2>/dev/null || echo "Docker group already exists"
 
-# 将当前用户添加到 docker 组（可选）
+# Add current user to docker group (optional)
 sudo usermod -aG docker $USER
 
-# 注意：需要重新登录才能生效
+# Note: Need to re-login for changes to take effect
 ```
 
-### 步骤 5: 配置 Docker 数据目录
+### Step 5: Configure Docker Data Directory
 
-#### 选项 A: 使用默认位置 (/var/lib/docker)
+#### Option A: Use Default Location (/var/lib/docker)
 
 ```bash
-# 创建默认数据目录
+# Create default data directory
 sudo mkdir -p /var/lib/docker
 ```
 
-#### 选项 B: 使用自定义位置
+#### Option B: Use Custom Location
 
 ```bash
-# 创建自定义数据目录（示例：/data/docker）
+# Create custom data directory (example: /data/docker)
 sudo mkdir -p /data/docker
 
-# 创建配置目录
+# Create configuration directory
 sudo mkdir -p /etc/docker
 
-# 创建 daemon.json 配置文件
+# Create daemon.json configuration file
 sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
 {
   "data-root": "/data/docker",
   "storage-driver": "overlay2",
-  "storage-opts": [
-    "overlay2.override_kernel_check=true"
-  ],
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "100m",
@@ -294,273 +312,273 @@ sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
 EOF
 ```
 
-### 步骤 6: 安装 systemd 服务文件
+### Step 6: Install systemd Service Files
 
-#### 6.1 了解 Docker Socket 激活
+#### 6.1 Understanding Docker Socket Activation
 
-Docker Socket 激活是一种按需启动机制，有两种模式可选：
+Docker Socket activation is an on-demand startup mechanism with two modes:
 
-**传统模式**（适合生产环境）：
-- Docker 开机自动启动并持续运行
-- 始终占用内存（约 50-100MB）
-- 响应速度快，无需等待启动
+**Traditional Mode** (suitable for production):
+- Docker starts automatically at boot and runs continuously
+- Always uses memory (about 50-100MB)
+- Fast response, no startup wait
 
-**Socket 激活模式**（适合开发环境）：
-- Docker 不会自动启动
-- 首次运行 docker 命令时才启动
-- 节省内存资源
-- 停止后再次使用会自动唤醒
+**Socket Activation Mode** (suitable for development):
+- Docker doesn't start automatically
+- Starts on first docker command execution
+- Saves memory resources
+- Automatically wakes up when used after stopping
 
-#### 6.2 复制服务文件
+#### 6.2 Copy Service Files
 
 ```bash
-# 复制 containerd 服务文件
+# Copy containerd service file
 sudo cp containerd.service /etc/systemd/system/
 
-# 复制 docker 服务文件
+# Copy docker service file
 sudo cp docker.service /etc/systemd/system/
 
-# 复制 docker socket 文件（可选）
+# Copy docker socket file (optional)
 sudo cp docker.socket /etc/systemd/system/
 ```
 
-#### 6.3 更新服务文件路径（如需要）
+#### 6.3 Update Service File Paths (if needed)
 
-如果您的二进制文件不在 `/usr/local/bin`，需要编辑服务文件：
+If your binaries are not in `/usr/local/bin`, edit the service files:
 
 ```bash
-# 编辑 docker.service
+# Edit docker.service
 sudo sed -i 's|/usr/local/bin/dockerd|/your/path/dockerd|g' /etc/systemd/system/docker.service
 
-# 编辑 containerd.service
+# Edit containerd.service
 sudo sed -i 's|/usr/local/bin/containerd|/your/path/containerd|g' /etc/systemd/system/containerd.service
 ```
 
-### 步骤 7: 加载内核模块
+### Step 7: Load Kernel Modules
 
 ```bash
-# 加载必需的内核模块
+# Load required kernel modules
 sudo modprobe overlay
 sudo modprobe br_netfilter
 
-# 设置内核参数
+# Set kernel parameters
 sudo tee /etc/sysctl.d/99-docker.conf > /dev/null << 'EOF'
 net.bridge.bridge-nf-call-iptables = 1
 net.bridge.bridge-nf-call-ip6tables = 1
 net.ipv4.ip_forward = 1
 EOF
 
-# 应用设置
+# Apply settings
 sudo sysctl --system
 ```
 
-### 步骤 8: 启动服务
+### Step 8: Start Services
 
-#### 8.1 选择启动模式
+#### 8.1 Choose Startup Mode
 
-**选项 A: 传统模式（Docker 始终运行）**
+**Option A: Traditional Mode (Docker always running)**
 
 ```bash
-# 重新加载 systemd 配置
+# Reload systemd configuration
 sudo systemctl daemon-reload
 
-# 启用并启动 containerd
+# Enable and start containerd
 sudo systemctl enable containerd
 sudo systemctl start containerd
 
-# 启用并启动 Docker（开机自动启动）
+# Enable and start Docker (auto-start at boot)
 sudo systemctl enable docker
 sudo systemctl start docker
 
-# 检查服务状态
+# Check service status
 sudo systemctl status docker
 ```
 
-**选项 B: Socket 激活模式（按需启动）**
+**Option B: Socket Activation Mode (on-demand startup)**
 
 ```bash
-# 重新加载 systemd 配置
+# Reload systemd configuration
 sudo systemctl daemon-reload
 
-# 启用并启动 containerd
+# Enable and start containerd
 sudo systemctl enable containerd
 sudo systemctl start containerd
 
-# 仅启用 socket（不启用 docker.service）
+# Only enable socket (not docker.service)
 sudo systemctl enable docker.socket
 sudo systemctl start docker.socket
 
-# 测试 socket 激活
-docker version  # 这会触发 Docker 自动启动
+# Test socket activation
+docker version  # This will trigger Docker to start automatically
 
-# 检查状态
+# Check status
 sudo systemctl status docker.socket
 sudo systemctl status docker
 ```
 
-#### 8.2 验证启动模式
+#### 8.2 Verify Startup Mode
 
 ```bash
-# 检查哪些服务被启用
+# Check which services are enabled
 systemctl list-unit-files | grep docker
 
-# 传统模式会显示：
+# Traditional mode will show:
 # docker.service    enabled
 # docker.socket     disabled
 
-# Socket 模式会显示：
+# Socket mode will show:
 # docker.service    disabled
 # docker.socket     enabled
 ```
 
-### 步骤 9: 安装 Docker Compose
+### Step 9: Install Docker Compose
 
 ```bash
-# 复制 docker-compose 到二进制目录
+# Copy docker-compose to binary directory
 sudo cp docker-compose /usr/local/bin/docker-compose
 
-# 设置执行权限
+# Set execute permission
 sudo chmod +x /usr/local/bin/docker-compose
 
-# 创建符号链接
+# Create symbolic link
 sudo ln -s /usr/local/bin/docker-compose /usr/bin/docker-compose
 ```
 
-### 步骤 10: 验证安装
+### Step 10: Verify Installation
 
 ```bash
-# 检查 Docker 版本
+# Check Docker version
 docker version
 
-# 检查 Docker 信息
+# Check Docker info
 docker info
 
-# 运行测试容器
+# Run test container
 docker run hello-world
 
-# 检查 Docker Compose 版本
+# Check Docker Compose version
 docker-compose version
 ```
 
 ---
 
-# 数据存储管理
+# Data Storage Management
 
-## 🔄 安装后数据迁移
+## 🔄 Post-Installation Data Migration
 
-如需在安装后迁移Docker数据到新位置：
+If you need to migrate Docker data to a new location after installation:
 
-### 使用迁移脚本
+### Using Migration Script
 
 ```bash
-# 添加执行权限
+# Add execute permission
 chmod +x migrate_docker.sh
 
-# 交互式迁移
+# Interactive migration
 sudo ./migrate_docker.sh
 
-# 自动迁移到指定位置
+# Automatic migration to specified location
 sudo ./migrate_docker.sh --target /new/path --yes
 ```
 
-### 手动迁移步骤
+### Manual Migration Steps
 
 ```bash
-# 1. 停止 Docker 服务
+# 1. Stop Docker services
 sudo systemctl stop docker
 sudo systemctl stop docker.socket
 
-# 2. 创建新目录
+# 2. Create new directory
 sudo mkdir -p /new/docker/path
 
-# 3. 迁移数据
+# 3. Migrate data
 sudo rsync -avP /var/lib/docker/ /new/docker/path/
 
-# 4. 备份旧目录
+# 4. Backup old directory
 sudo mv /var/lib/docker /var/lib/docker.backup
 
-# 5. 更新配置
+# 5. Update configuration
 sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
 {
   "data-root": "/new/docker/path"
 }
 EOF
 
-# 6. 重启服务
+# 6. Restart services
 sudo systemctl start docker
 ```
 
-## 📊 存储监控
+## 📊 Storage Monitoring
 
 ```bash
-# 查看 Docker 磁盘使用
+# View Docker disk usage
 docker system df
 
-# 查看详细信息
+# View detailed information
 docker system df -v
 
-# 清理未使用资源
+# Clean unused resources
 docker system prune -a
 
-# 查看容器磁盘使用
+# View container disk usage
 docker ps -s
 ```
 
 ---
 
-# 故障排除与维护
+# Troubleshooting & Maintenance
 
-## ❓ 常见问题
+## ❓ Common Issues
 
-### 1. 权限错误
+### 1. Permission Error
 ```bash
-# 错误：This script must be run as root or with sudo privileges
-# 解决：使用 sudo 运行脚本
+# Error: This script must be run as root or with sudo privileges
+# Solution: Run script with sudo
 ```
 
-### 2. 内核版本过低
+### 2. Kernel Version Too Old
 ```bash
-# 错误：Kernel version x.x.x is too old. Minimum required: 3.10
-# 解决：升级系统内核或使用更新的操作系统
+# Error: Kernel version x.x.x is too old. Minimum required: 3.10
+# Solution: Upgrade kernel or use newer operating system
 ```
 
-### 3. 磁盘空间不足
+### 3. Insufficient Disk Space
 ```bash
-# 错误：Insufficient disk space. Required: 2048MB
-# 解决：清理磁盘空间或选择其他分区
+# Error: Insufficient disk space. Required: 2048MB
+# Solution: Clean disk space or choose another partition
 ```
 
-### 4. Docker服务无法启动
+### 4. Docker Service Cannot Start
 ```bash
-# 查看详细错误
+# View detailed errors
 sudo systemctl status docker
 sudo journalctl -xe -u docker
 
-# 尝试手动启动调试
+# Try manual debug startup
 sudo dockerd --debug
 ```
 
-### 5. Socket权限问题
+### 5. Socket Permission Issues
 ```bash
-# 确保 socket 文件权限正确
+# Ensure socket file permissions are correct
 ls -la /run/docker.sock
-# 应该显示: srw-rw---- ... root docker
+# Should show: srw-rw---- ... root docker
 
-# 修复权限
+# Fix permissions
 sudo chmod 660 /run/docker.sock
 sudo chown root:docker /run/docker.sock
 
-# 添加用户到docker组
+# Add user to docker group
 sudo usermod -aG docker $USER
 newgrp docker
 ```
 
-### 6. 存储驱动问题
+### 6. Storage Driver Issues
 ```bash
-# 检查支持的存储驱动
+# Check supported storage drivers
 docker info | grep "Storage Driver"
 
-# 如果 overlay2 不可用，使用 devicemapper
+# If overlay2 is not available, use devicemapper
 sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
 {
   "storage-driver": "devicemapper"
@@ -570,24 +588,29 @@ EOF
 sudo systemctl restart docker
 ```
 
-### 7. 网络问题
+### 7. Network Issues (iptables not found)
 ```bash
-# 检查 iptables 规则
-sudo iptables -L -n
+# Install iptables (if needed)
+# For RHEL/CentOS:
+sudo yum install -y iptables iptables-services
 
-# 重置 iptables（谨慎使用）
-sudo iptables -F
-sudo iptables -X
-sudo iptables -t nat -F
-sudo iptables -t nat -X
+# For Ubuntu/Debian:
+sudo apt-get install -y iptables
 
-# 重启 Docker
+# Or configure Docker without iptables (limited networking)
+sudo tee /etc/docker/daemon.json > /dev/null << 'EOF'
+{
+  "iptables": false,
+  "bridge": "none"
+}
+EOF
+
 sudo systemctl restart docker
 ```
 
-## 🔍 切换启动模式
+## 🔍 Switching Startup Modes
 
-### 从传统模式切换到 Socket 模式
+### Switch from Traditional to Socket Mode
 ```bash
 sudo systemctl disable docker
 sudo systemctl stop docker
@@ -595,7 +618,7 @@ sudo systemctl enable docker.socket
 sudo systemctl start docker.socket
 ```
 
-### 从 Socket 模式切换到传统模式
+### Switch from Socket to Traditional Mode
 ```bash
 sudo systemctl disable docker.socket
 sudo systemctl stop docker.socket
@@ -603,17 +626,14 @@ sudo systemctl enable docker
 sudo systemctl start docker
 ```
 
-## 📝 配置文件示例
+## 📝 Configuration File Examples
 
-### 完整的 daemon.json 示例
+### Complete daemon.json Example
 
 ```json
 {
   "data-root": "/var/lib/docker",
   "storage-driver": "overlay2",
-  "storage-opts": [
-    "overlay2.override_kernel_check=true"
-  ],
   "log-driver": "json-file",
   "log-opts": {
     "max-size": "100m",
@@ -645,77 +665,77 @@ sudo systemctl start docker
 
 ---
 
-# 卸载与清理
+# Uninstallation & Cleanup
 
-## 🗑️ 卸载 Docker
+## 🗑️ Uninstall Docker
 
-### 使用卸载脚本
+### Using Uninstall Script
 
 ```bash
-# 保留数据卸载
+# Uninstall keeping data
 sudo ./uninstall.sh
 
-# 完全删除（包括数据）
+# Complete removal (including data)
 sudo ./uninstall.sh --purge
 ```
 
-### 手动卸载步骤
+### Manual Uninstall Steps
 
 ```bash
-# 停止服务
+# Stop services
 sudo systemctl stop docker
 sudo systemctl stop containerd
 
-# 禁用服务
+# Disable services
 sudo systemctl disable docker
 sudo systemctl disable containerd
 
-# 删除服务文件
+# Remove service files
 sudo rm -f /etc/systemd/system/docker.service
 sudo rm -f /etc/systemd/system/containerd.service
 sudo rm -f /etc/systemd/system/docker.socket
 
-# 删除二进制文件
+# Remove binaries
 sudo rm -f /usr/local/bin/docker*
 sudo rm -f /usr/local/bin/containerd*
 sudo rm -f /usr/local/bin/ctr
 sudo rm -f /usr/local/bin/runc
 
-# 删除符号链接
+# Remove symbolic links
 sudo rm -f /usr/bin/docker*
 sudo rm -f /usr/bin/containerd*
 sudo rm -f /usr/bin/ctr
 sudo rm -f /usr/bin/runc
 
-# 删除配置文件
+# Remove configuration files
 sudo rm -rf /etc/docker
 
-# 删除数据（谨慎！这将删除所有容器和镜像）
+# Remove data (CAUTION! This will delete all containers and images)
 # sudo rm -rf /var/lib/docker
 # sudo rm -rf /var/lib/containerd
 
-# 删除 docker 组
+# Remove docker group
 sudo groupdel docker
 ```
 
 ---
 
-# 验证与测试
+# Verification & Testing
 
-## 📊 验证安装
+## 📊 Verify Installation
 
 ```bash
-# 检查版本
+# Check versions
 docker version
 docker-compose version
 
-# 查看Docker信息
+# View Docker info
 docker info
 
-# 运行测试容器
+# Run test container
 docker run hello-world
 
-# 测试 Docker Compose
+# Test Docker Compose
 echo "version: '3'" > test-compose.yml
 echo "services:" >> test-compose.yml
 echo "  hello:" >> test-compose.yml
@@ -725,121 +745,121 @@ docker-compose -f test-compose.yml up
 rm test-compose.yml
 ```
 
-## 📚 日志和状态
+## 📚 Logs and Status
 
-### 日志文件位置
-- 安装日志：`install_YYYYMMDD_HHMMSS.log`
-- 迁移日志：`migrate_YYYYMMDD_HHMMSS.log`
-- 卸载日志：`uninstall_YYYYMMDD_HHMMSS.log`
+### Log File Locations
+- Installation log: `install_YYYYMMDD_HHMMSS.log`
+- Migration log: `migrate_YYYYMMDD_HHMMSS.log`
+- Uninstall log: `uninstall_YYYYMMDD_HHMMSS.log`
 
-### 查看日志
+### Viewing Logs
 ```bash
-# 查看最新安装日志
+# View latest installation log
 ls -lt install_*.log | head -1
 
-# 实时查看日志
+# Real-time log viewing
 tail -f install_*.log
 
-# 查看 Docker 服务日志
+# View Docker service logs
 sudo journalctl -xe -u docker
 sudo journalctl -xe -u containerd
 ```
 
 ---
 
-# 优化建议与最佳实践
+# Optimization Suggestions & Best Practices
 
-## 🚀 优化建议
+## 🚀 Optimization Suggestions
 
-### 1. 日志管理
+### 1. Log Management
 
-限制容器日志大小：
+Limit container log size:
 
 ```bash
-# 在 daemon.json 中配置
+# Configure in daemon.json
 "log-opts": {
   "max-size": "50m",
   "max-file": "3"
 }
 ```
 
-### 2. 存储清理
+### 2. Storage Cleanup
 
-定期清理未使用的资源：
+Regularly clean unused resources:
 
 ```bash
-# 清理未使用的容器、网络、镜像
+# Clean unused containers, networks, images
 docker system prune -a
 
-# 查看磁盘使用情况
+# View disk usage
 docker system df
 ```
 
-### 3. 资源限制
+### 3. Resource Limits
 
-为容器设置资源限制：
+Set resource limits for containers:
 
 ```bash
-# 限制内存和 CPU
+# Limit memory and CPU
 docker run -m 512m --cpus="1.0" your-image
 ```
 
-### 4. 监控
+### 4. Monitoring
 
-设置监控和告警：
+Set up monitoring and alerts:
 
 ```bash
-# 查看实时资源使用
+# View real-time resource usage
 docker stats
 
-# 导出指标
+# Export metrics
 docker system events
 ```
 
-## 💡 最佳实践
+## 💡 Best Practices
 
-1. **选择合适的存储位置** - 避免使用系统盘，选择空间充足的数据盘
-2. **备份重要数据** - 定期备份重要的容器和数据卷
-3. **定期清理** - 使用 `docker system prune` 清理未使用资源
-4. **监控磁盘使用** - 使用 `docker system df` 查看空间占用
-5. **保留日志** - 保存安装日志以备故障排查
-6. **测试验证** - 安装后充分测试Docker功能
-7. **定期更新** - 定期更新Docker到最新版本
+1. **Choose appropriate storage location** - Avoid system disk, choose data disk with sufficient space
+2. **Backup important data** - Regularly backup important containers and data volumes
+3. **Regular cleanup** - Use `docker system prune` to clean unused resources
+4. **Monitor disk usage** - Use `docker system df` to check space usage
+5. **Keep logs** - Save installation logs for troubleshooting
+6. **Test verification** - Thoroughly test Docker functionality after installation
+7. **Regular updates** - Regularly update Docker to the latest version
 
-## 🆘 获取帮助
+## 🆘 Getting Help
 
 ```bash
-# 显示脚本帮助信息
+# Show script help information
 ./install.sh --help
 ./migrate_docker.sh --help
 ./uninstall.sh --help
 
-# 启用调试模式获取详细信息
+# Enable debug mode for detailed information
 sudo ./install.sh --debug
 ```
 
 ---
 
-# 参考资源
+# Reference Resources
 
-## 📚 相关文档
+## 📚 Related Documentation
 
-- [Docker 官方文档](https://docs.docker.com)
-- [Docker Compose 文档](https://docs.docker.com/compose/)
-- [Containerd 文档](https://containerd.io)
+- [Docker Official Documentation](https://docs.docker.com)
+- [Docker Compose Documentation](https://docs.docker.com/compose/)
+- [Containerd Documentation](https://containerd.io)
 
-## ⚠️ 注意事项
+## ⚠️ Important Notes
 
-- 本安装包适用于离线环境
-- 安装前请确保满足系统要求
-- 生产环境使用前请充分测试
-- 建议定期更新到最新版本
-- 重复执行脚本会进行覆盖安装
+- This installation package is suitable for offline environments
+- Ensure system requirements are met before installation
+- Thoroughly test before production use
+- Regular updates to the latest version are recommended
+- Running the script repeatedly will perform an overwrite installation
 
-## 📄 许可证
+## 📄 License
 
-本安装脚本采用 MIT 许可证。Docker 和 Docker Compose 遵循其各自的许可证。
+This installation script is under MIT License. Docker and Docker Compose follow their respective licenses.
 
 ---
 
-**版本**: 2.0.0 | **更新日期**: 2024
+**Version**: 2.0.0 | **Updated**: 2024

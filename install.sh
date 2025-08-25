@@ -469,7 +469,7 @@ select_docker_data_directory() {
     echo "The default location is /var/lib/docker"
     echo ""
     
-    read -p "自定义 Docker 数据目录 (直接回车使用默认 /var/lib/docker): " custom_path
+    read -p "Custom Docker data directory (press Enter for default /var/lib/docker): " custom_path
     
     if [[ -z "$custom_path" ]]; then
         log_info "Using default Docker data directory: /var/lib/docker"
@@ -485,7 +485,7 @@ select_docker_data_directory() {
             log_warning "Parent directory does not exist: $parent_dir"
             mkdir -p "$parent_dir" || {
                 log_error "Failed to create parent directory"
-                read -p "请重新输入路径: " custom_path
+                read -p "Please enter path again: " custom_path
                 continue
             }
         fi
@@ -756,29 +756,29 @@ configure_docker_socket() {
     {
         echo ""
         echo "=========================================="
-        echo "     Docker Socket 激活配置"
+        echo "     Docker Socket Activation Configuration"
         echo "=========================================="
         echo ""
-        echo "Docker Socket 可以让 Docker 按需启动，而不是始终运行："
+        echo "Docker Socket allows Docker to start on-demand instead of always running:"
         echo ""
-        echo "  传统模式 (systemctl enable docker):"
-        echo "    • Docker 开机自动启动并持续运行"
-        echo "    • 始终占用内存（约 50-100MB）"
-        echo "    • 适合生产环境和频繁使用场景"
+        echo "  Traditional mode (systemctl enable docker):"
+        echo "    • Docker starts automatically at boot and runs continuously"
+        echo "    • Always uses memory (about 50-100MB)"
+        echo "    • Suitable for production environments and frequent use"
         echo ""
-        echo "  Socket 激活模式 (systemctl enable docker.socket):"
-        echo "    • Docker 不会自动启动，首次使用时才启动"
-        echo "    • 节省内存资源，适合开发环境"
-        echo "    • 执行 docker 命令时自动唤醒服务"
+        echo "  Socket activation mode (systemctl enable docker.socket):"
+        echo "    • Docker doesn't start automatically, starts on first use"
+        echo "    • Saves memory resources, suitable for development environments"
+        echo "    • Service starts automatically when docker command is executed"
         echo ""
     } >&2
     
     local use_socket=false
-    if confirm_action "是否启用 Docker Socket 激活（推荐用于开发环境）"; then
+    if confirm_action "Enable Docker Socket activation (recommended for development)"; then
         use_socket=true
-        log_info "将配置 Docker Socket 激活模式"
+        log_info "Will configure Docker Socket activation mode"
     else
-        log_info "将使用传统启动模式（Docker 始终运行）"
+        log_info "Will use traditional startup mode (Docker always running)"
     fi
     
     # Return only the socket configuration value
@@ -1062,8 +1062,8 @@ start_services() {
 
 install_docker_compose() {
     echo ""
-    echo "Docker Compose 是用于定义和运行多容器 Docker 应用程序的工具"
-    read -p "是否安装 Docker Compose? (Y/n): " install_compose
+    echo "Docker Compose is a tool for defining and running multi-container Docker applications"
+    read -p "Install Docker Compose? (Y/n): " install_compose
     
     # Default to yes if empty
     if [[ -z "$install_compose" ]] || [[ "$install_compose" =~ ^[Yy]$ ]]; then
@@ -1110,7 +1110,7 @@ verify_installation() {
     echo ""
     log_info "Testing Docker..."
     if command_exists docker; then
-        echo "Docker 版本信息:"
+        echo "Docker version information:"
         docker version 2>/dev/null || {
             log_error "Docker daemon is not running or not accessible"
             all_good=false
@@ -1125,7 +1125,7 @@ verify_installation() {
         echo ""
         log_info "Testing Docker Compose..."
         if command_exists docker-compose; then
-            echo "Docker Compose 版本信息:"
+            echo "Docker Compose version information:"
             docker-compose version 2>/dev/null || {
                 log_warning "Docker Compose command failed"
             }
@@ -1211,7 +1211,7 @@ main() {
     # Check for existing Docker data and handle migration if needed
     check_existing_docker_data
     
-    log_info "开始安装 Docker..."
+    log_info "Starting Docker installation..."
     
     # Extract Docker binaries
     extract_docker_binaries || {
@@ -1260,7 +1260,7 @@ main() {
     log_info "Installation log saved to: $LOG_FILE"
     
     echo ""
-    log_info "安装完成！以下是验证结果："
+    log_info "Installation complete! Verification results:"
     
     if [[ -n "${SUDO_USER}" ]] && [[ "${SUDO_USER}" != "root" ]]; then
         log_warning "Remember to log out and back in for docker group membership to take effect"
