@@ -15,7 +15,7 @@ set -o pipefail  # Exit on pipe failure
 SCRIPT_VERSION="2.0.0"
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/install_$(date +%Y%m%d_%H%M%S).log"
-DOCKER_TGZ="${SCRIPT_DIR}/docker-28.2.2.tgz"
+DOCKER_TGZ="${SCRIPT_DIR}/docker.tgz"
 DOCKER_COMPOSE_BIN="${SCRIPT_DIR}/docker-compose"
 
 # Default paths (can be overridden)
