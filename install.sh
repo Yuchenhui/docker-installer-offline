@@ -349,6 +349,44 @@ check_storage_driver() {
     return 0
 }
 
+check_network_tools() {
+    log_info "Checking network tools..."
+    
+    # Check for iptables
+    if ! command_exists iptables; then
+        log_warning "iptables is not installed. Docker networking will be limited."
+        log_warning "Without iptables:"
+        log_warning "  - Port mapping (-p) won't work"
+        log_warning "  - Bridge networking won't work"
+        log_warning "  - Containers must use --network host"
+        log_info "To install iptables later:"
+        log_info "  RHEL/CentOS: sudo yum install iptables"
+        log_info "  Ubuntu/Debian: sudo apt-get install iptables"
+        log_info "  SUSE: sudo zypper install iptables"
+        
+        # Ask user if they want to continue without iptables
+        if confirm_action "Continue installation without iptables (limited networking)"; then
+            log_info "Continuing without iptables - Docker will be configured for limited networking"
+            # Set flag to configure Docker without iptables
+            DOCKER_NO_IPTABLES=true
+        else
+            log_error "Installation cancelled. Please install iptables first."
+            return 1
+        fi
+    else
+        log_success "iptables found"
+        DOCKER_NO_IPTABLES=false
+    fi
+    
+    # Check for ip command
+    if ! command_exists ip; then
+        log_warning "ip command not found. Installing iproute2 is recommended."
+    fi
+    
+    log_success "Network tools check completed"
+    return 0
+}
+
 check_disk_space() {
     log_info "Checking disk space..."
     
@@ -564,6 +602,7 @@ run_prerequisite_checks() {
     check_kernel_modules || checks_passed=false
     check_cgroups || checks_passed=false
     check_storage_driver || checks_passed=false
+    check_network_tools || checks_passed=false
     check_disk_space || checks_passed=false
     
     if [[ "$checks_passed" == "false" ]]; then
@@ -904,6 +943,14 @@ configure_docker() {
     # Build daemon.json content based on configuration
     local daemon_content="{
   \"storage-driver\": \"${DOCKER_STORAGE_DRIVER}\","
+    
+    # Add iptables configuration if needed
+    if [[ "${DOCKER_NO_IPTABLES:-false}" == "true" ]]; then
+        daemon_content="${daemon_content}
+  \"iptables\": false,
+  \"bridge\": \"none\","
+        log_warning "Configuring Docker without iptables - networking will be limited"
+    fi
     
     # Add custom data-root if specified
     if [[ -n "$DOCKER_CUSTOM_DATA_ROOT" ]]; then
