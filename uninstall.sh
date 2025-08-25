@@ -1,10 +1,11 @@
 #!/bin/bash
 
 # ============================================================================
-# Docker & Docker Compose Uninstallation Script
+# Docker & Docker Compose Uninstallation Script (Simplified Version)
 # ============================================================================
 # Author: Docker Uninstall Script
 # Description: Safely uninstall Docker and Docker Compose with cleanup
+#              Matches the simplified install.sh without state file
 # ============================================================================
 
 set -e
@@ -13,7 +14,6 @@ set -o pipefail
 # --- Configuration Variables ---
 SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 LOG_FILE="${SCRIPT_DIR}/uninstall_$(date +%Y%m%d_%H%M%S).log"
-STATE_FILE="${SCRIPT_DIR}/.install_state"
 
 # Default paths (can be overridden)
 DOCKER_BIN_DIR="${DOCKER_BIN_DIR:-/usr/local/bin}"
@@ -75,17 +75,6 @@ check_root() {
     if [[ $EUID -ne 0 ]]; then
         log_error "This script must be run as root or with sudo privileges"
         exit 1
-    fi
-}
-
-load_state() {
-    if [[ -f "$STATE_FILE" ]]; then
-        log_info "Loading installation state from: $STATE_FILE"
-        source "$STATE_FILE"
-        return 0
-    else
-        log_warning "No installation state file found. Will use default paths."
-        return 1
     fi
 }
 
@@ -250,8 +239,38 @@ remove_docker_group() {
     fi
 }
 
+detect_docker_data_dir() {
+    log_info "Detecting Docker data directory..."
+    
+    # Check daemon.json for custom data-root
+    if [[ -f "${DOCKER_CONFIG_DIR}/daemon.json" ]]; then
+        local custom_data_root
+        custom_data_root=$(grep -o '"data-root"[[:space:]]*:[[:space:]]*"[^"]*"' "${DOCKER_CONFIG_DIR}/daemon.json" 2>/dev/null | cut -d'"' -f4)
+        
+        if [[ -n "$custom_data_root" ]] && [[ -d "$custom_data_root" ]]; then
+            log_info "Found custom Docker data directory in daemon.json: $custom_data_root"
+            DOCKER_DATA_DIR="$custom_data_root"
+        fi
+    fi
+    
+    # Also check common locations
+    local possible_dirs=(
+        "$DOCKER_DATA_DIR"
+        "/var/lib/docker"
+    )
+    
+    for dir in "${possible_dirs[@]}"; do
+        if [[ -d "$dir" ]] && [[ -n "$(ls -A "$dir" 2>/dev/null)" ]]; then
+            log_info "Found Docker data at: $dir"
+        fi
+    done
+}
+
 remove_docker_data() {
     log_info "Checking Docker data..."
+    
+    # Detect actual Docker data directory
+    detect_docker_data_dir
     
     if [[ -d "$DOCKER_DATA_DIR" ]]; then
         local data_size
@@ -265,7 +284,7 @@ remove_docker_data() {
             log_info "Docker data directory kept"
         fi
     else
-        log_info "Docker data directory does not exist"
+        log_info "Docker data directory does not exist at: $DOCKER_DATA_DIR"
     fi
 }
 
@@ -290,18 +309,11 @@ remove_docker_config() {
     fi
 }
 
-remove_state_file() {
-    if [[ -f "$STATE_FILE" ]]; then
-        rm -f "$STATE_FILE"
-        log_info "Installation state file removed"
-    fi
-}
-
 cleanup_misc() {
     log_info "Performing miscellaneous cleanup..."
     
     # Remove docker network interfaces
-    for interface in $(ip link show | grep -o 'docker[0-9]*' | sort -u); do
+    for interface in $(ip link show 2>/dev/null | grep -o 'docker[0-9]*' | sort -u); do
         ip link delete "$interface" 2>/dev/null || true
         log_info "Removed network interface: $interface"
     done
@@ -349,9 +361,6 @@ main() {
     # Check root privileges
     check_root
     
-    # Load installation state if available
-    load_state
-    
     log_warning "This will uninstall Docker and Docker Compose from your system"
     
     if [[ "${PURGE:-0}" == "1" ]]; then
@@ -384,21 +393,20 @@ main() {
     # Remove docker config
     remove_docker_config
     
-    # Remove docker data (if purge mode)
+    # Remove docker data (if purge mode or user confirms)
     if [[ "${PURGE:-0}" == "1" ]]; then
         remove_docker_data
     else
+        # Detect and inform about existing Docker data
+        detect_docker_data_dir
         if [[ -d "$DOCKER_DATA_DIR" ]]; then
             log_info "Docker data directory preserved at: $DOCKER_DATA_DIR"
-            log_info "Use --purge flag to remove it"
+            log_info "Use --purge flag or manually remove to delete all Docker data"
         fi
     fi
     
     # Cleanup miscellaneous
     cleanup_misc
-    
-    # Remove state file
-    remove_state_file
     
     log_success "=== Docker uninstallation completed ==="
     log_info "Uninstallation log saved to: $LOG_FILE"
@@ -438,6 +446,9 @@ EXAMPLES:
 
 WARNING:
     Using --purge will permanently delete all Docker containers, images, and volumes!
+    
+NOTE:
+    This script will automatically detect custom Docker data directories from daemon.json
 
 EOF
 }
